@@ -1,0 +1,4 @@
+date
+ps
+sleep 1
+pwd

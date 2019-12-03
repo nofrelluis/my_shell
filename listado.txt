@@ -1,0 +1,4 @@
+total 20
+-rw-r--r-- 1 nofre nofre     0 nov 28 20:03 listado.txt
+-rw-r--r-- 1 nofre nofre 14153 nov 28 20:02 my_shell.c
+-rw-r--r-- 1 nofre nofre    43 nov 28 20:03 salida.txt
