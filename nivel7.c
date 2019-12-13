@@ -1,10 +1,10 @@
 /*Autores:
     Nofre Lluis Bibiloni Clar
-    Aina Galiana Rodriguez
-    Michael Alexander Garcia Moreira
+    Sergio Garcia Puertas
+    Bartomeu Ramis Tarragó
 */
 
-#define USE_READLINE
+//#define USE_READLINE
 #define _POSIX_C_SOURCE 200112L
 #define COMMAND_LINE_SIZE 1024
 #define ARGS_SIZE 64
@@ -22,11 +22,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <inttypes.h> 
-#include <sys/file.h> 
+#include <inttypes.h> //new
+#include <sys/file.h> //new
 #include <unistd.h>
-#include <stdlib.h> 
-#include <errno.h> 
+#include <stdlib.h> //new
+#include <errno.h> //new
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -40,8 +40,8 @@
 
 int execute_line(char *line);
 int n_pids = 0; //suponemos no cuenta el foreground;
-char **prompt;
-char *my_shell = "./my_shell";
+char *prompt[3];
+char *my_shell = "./nivel7";
 
 struct info_process {
     pid_t pid;
@@ -71,14 +71,10 @@ void imprimir_prompt(){
 //Método para leer la instrucción que se escriba en la consola y la assigna a line
 char *read_line(char *line){
     #ifdef USE_READLINE 
-		char **prompt= NULL;
-		obtener_prompt(prompt);
 		imprimir_prompt();
         static char *line_read = (char *)NULL; 
-        char *aux_prompt = NULL;
-        sprintf(aux_prompt,prompt[0],prompt[1],prompt[2]);
-        line_read = readline(aux_prompt);
-		//char *ptr = readline(aux_prompt);
+        /*line_read = readline (prompt);
+		ptr = readline (prompt);*/
         if (line_read){ 
 			free(line_read);
 			line_read = (char *)NULL;
@@ -126,7 +122,6 @@ forma que en el shell*/
 int internal_cd(char **args){
     int e = 0;
     if (args[1]==NULL){
-        //fprintf(stdout, "%s\n",getenv("HOME"));
         chdir(getenv("HOME"));
     } else {
         e = chdir(args[1]);
@@ -134,8 +129,6 @@ int internal_cd(char **args){
             perror("Atención error");
         }
     }
-    /*char cwd[ARGS_SIZE]; 
-    printf("[%s\n]",getcwd(cwd, ARGS_SIZE));*/
 	return 0;
 }
 
@@ -163,12 +156,9 @@ int internal_export(char **args){
     nomVal[0] = strtok(args[1],"="); 
     nomVal[1] = strtok(NULL, " \n\t\r"); //Se separan los dos nombres y se assignan a nomVal[]  
     if ((nomVal[1]!=NULL)&&(nomVal[0] != NULL)){ //Comprueba Sintaxis correcta
-        //printf( "[%s\n]",getenv(nomVal[0]));
         e = setenv(nomVal[0],nomVal[1],1);
         if (e ==-1){
             perror("Error de sintaxis");
-        } else {
-            //fprintf(stdout, "[%s\n]",getenv(nomVal[0]));
         }
     } else {
         printf("Error de sintaxis: Faltan argumentos \n");
@@ -247,7 +237,7 @@ int jobs_list_add(pid_t pid, char status, char *command_line){
   		jobs_list[n_pids] ->pid = pid;
     	jobs_list[n_pids] ->status = status;
     	jobs_list[n_pids] ->command_line = command_line;
-		fprintf(stdout,"[%d]    Pid: %d Status: %c Command_line: %s\n",
+		fprintf(stdout,"[%d], Pid: %d, Status: %c, Command_line: %s\n",
                         n_pids,
                         jobs_list[n_pids] ->pid,
                         jobs_list[n_pids] ->status,
@@ -270,7 +260,7 @@ void reaper(int signum){
         jobs_list[0] ->command_line = NULL;
     }else if((pidchld != 0)&&(jobs_list[1] != 0)){ // Si no es el primero y no es primer proceso en bakcground
         int pchild= jobs_list_find(pidchld); //Busca el proceso que ha terminado
-        fprintf(stdout,"Ha terminado el proceso: [%d]   Pid: %d Status: %c Command_line: %s\n",
+        fprintf(stdout,"Ha terminado el proceso: %d, Pid: %d, Status: %c, Command_line: %s\n",
                         pchild,
                         jobs_list[pchild] ->pid,
                         jobs_list[pchild] ->status,
@@ -385,11 +375,9 @@ int execute_line(char *line){
         if (pid == 0) { //Es HIJO
             signal(SIGINT, SIG_IGN);
             if (is_back == 0){
-				//signal(SIGINT, NULL); //Si es hijo ignora ctrl+C
                 signal(SIGTSTP,NULL); //Si es hijo en background ignora ctrl+Z
             } else {
                 signal(SIGTSTP, ctrlz);
-				//signal(SIGINT, ctrlc);
             }
             signal(SIGCHLD, SIG_DFL);
             is_output_redirection(args);

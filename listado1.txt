@@ -1,6 +1,0 @@
-total 28
--rw-r--r-- 1 nofre nofre    20 nov 28 20:07 comandos.txt
--rw-r--r-- 1 nofre nofre     0 nov 28 20:13 listado1.txt
--rw-r--r-- 1 nofre nofre   175 nov 28 20:03 listado.txt
--rw-r--r-- 1 nofre nofre 14153 nov 28 20:02 my_shell.c
--rw-r--r-- 1 nofre nofre    43 nov 28 20:03 salida.txt
